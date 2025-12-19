@@ -38,7 +38,7 @@ android {
         applicationId = "com.example.rotiku"
         // You can update the following values to match your application needs.
         // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
-        minSdk = 21  // Required for Firebase
+        minSdk = 23  // Required for Firebase Auth 5.x
         targetSdk = flutter.targetSdkVersion
         versionCode = flutterVersionCode.toInteger()
         versionName = flutterVersionName

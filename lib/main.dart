@@ -13,20 +13,35 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
   // Initialize Firebase with generated options
+  bool firebaseInitialized = false;
+  String? firebaseError;
+  
   try {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
+    firebaseInitialized = true;
     print('✅ Firebase initialized successfully');
   } catch (e) {
+    firebaseError = e.toString();
     print('⚠️ Firebase initialization failed: $e');
   }
   
-  runApp(const MyApp());
+  runApp(MyApp(
+    firebaseInitialized: firebaseInitialized,
+    firebaseError: firebaseError,
+  ));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final bool firebaseInitialized;
+  final String? firebaseError;
+  
+  const MyApp({
+    super.key,
+    required this.firebaseInitialized,
+    this.firebaseError,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +52,10 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         title: 'ROTIKU',
         theme: AppTheme.theme,
-        home: const AuthWrapper(),
+        home: AuthWrapper(
+          firebaseInitialized: firebaseInitialized,
+          firebaseError: firebaseError,
+        ),
         debugShowCheckedModeBanner: false,
       ),
     );
@@ -45,69 +63,100 @@ class MyApp extends StatelessWidget {
 }
 
 class AuthWrapper extends StatelessWidget {
-  const AuthWrapper({super.key});
+  final bool firebaseInitialized;
+  final String? firebaseError;
+  
+  const AuthWrapper({
+    super.key,
+    required this.firebaseInitialized,
+    this.firebaseError,
+  });
 
   @override
   Widget build(BuildContext context) {
     // Check if Firebase is initialized before trying to use it
-    if (Firebase.apps.isEmpty) {
-      // Firebase not initialized -  show login screen for UI preview only
+    if (!firebaseInitialized) {
+      // Firebase not initialized - show error screen
       return Scaffold(
         appBar: AppBar(
-          title: const Text('ROTIKU - UI Preview'),
-          backgroundColor: Colors.orange,
+          title: const Text('ROTIKU - Setup Required'),
+          backgroundColor: Colors.red,
         ),
         body: Center(
           child: Padding(
             padding: const EdgeInsets.all(24),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(
-                  Icons.warning_amber_rounded,
-                  size: 80,
-                  color: Colors.orange,
-                ),
-                const SizedBox(height: 24),
-                const Text(
-                  'Firebase Not Configured',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(
+                    Icons.error_outline,
+                    size: 80,
+                    color: Colors.red,
                   ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 16),
-                const Text(
-                  'App is running in UI preview mode.\\n\\n'
-                  'To enable full functionality:\\n'
-                  '1. Setup Firebase project\\n'
-                  '2. Add google-services.json\\n'
-                  '3. Enable Authentication & Firestore',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 14),
-                ),
-                const SizedBox(height: 32),
-                ElevatedButton(
-                  onPressed: () {
-                    // Just show login screen for preview
-                    Navigator.of(context).pushReplacement(
-                      MaterialPageRoute(builder: (_) => const LoginScreen()),
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.orange,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 32,
-                      vertical: 16,
+                  const SizedBox(height: 24),
+                  const Text(
+                    'Firebase Connection Failed',
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
                     ),
+                    textAlign: TextAlign.center,
                   ),
-                  child: const Text(
-                    'Preview Login Screen',
-                    style: TextStyle(fontSize: 16),
+                  const SizedBox(height: 16),
+                  if (firebaseError != null) ...[
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.red.shade50,
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: Colors.red.shade200),
+                      ),
+                      child: Text(
+                        'Error: $firebaseError',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.red.shade900,
+                          fontFamily: 'monospace',
+                        ),
+                        textAlign: TextAlign.left,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                  ],
+                  const Text(
+                    'Langkah troubleshooting:\n\n'
+                    '1. Pastikan koneksi internet aktif\n'
+                    '2. Verifikasi google-services.json ada di android/app/\n'
+                    '3. Cek Firebase Console - project harus aktif\n'
+                    '4. Jalankan: flutter clean && flutter pub get\n'
+                    '5. Rebuild aplikasi',
+                    textAlign: TextAlign.left,
+                    style: TextStyle(fontSize: 14),
                   ),
-                ),
-              ],
+                  const SizedBox(height: 32),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      ElevatedButton.icon(
+                        onPressed: () {
+                          // Restart the app - user needs to do this manually
+                          // This button is just for UX
+                        },
+                        icon: const Icon(Icons.refresh),
+                        label: const Text('Coba Lagi'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.orange,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 24,
+                            vertical: 12,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
         ),
