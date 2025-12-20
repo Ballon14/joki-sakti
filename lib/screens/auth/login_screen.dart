@@ -4,6 +4,7 @@ import '../../config/theme.dart';
 import '../../services/auth_service.dart';
 import '../../widgets/buttons/primary_button.dart';
 import '../main/main_screen.dart';
+import '../admin/admin_main_screen.dart';
 import 'register_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -43,15 +44,28 @@ class _LoginScreenState extends State<LoginScreen> {
       // Lazy init AuthService
       _authService ??= AuthService();
       
-      await _authService!.signIn(
+      final userCredential = await _authService!.signIn(
         _emailController.text,
         _passwordController.text,
       );
 
-      if (mounted) {
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (_) => const MainScreen()),
-        );
+      if (mounted && userCredential != null) {
+        // Check user role and redirect appropriately
+        final userData = await _authService!.getUserData(userCredential.user!.uid);
+        
+        if (mounted) {
+          if (userData?.isAdmin == true) {
+            // Admin user - go to admin screen
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(builder: (_) => const AdminMainScreen()),
+            );
+          } else {
+            // Regular user - go to main screen
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(builder: (_) => const MainScreen()),
+            );
+          }
+        }
       }
     } catch (e) {
       if (mounted) {

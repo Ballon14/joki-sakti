@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import '../../config/theme.dart';
 import '../../services/auth_service.dart';
+import '../../services/notification_service.dart';
 import '../../models/user.dart';
 import '../auth/login_screen.dart';
 import '../profile/account_info_screen.dart';
 import '../profile/help_support_screen.dart';
 import '../profile/saved_addresses_screen.dart';
+import '../notifications/notifications_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -203,13 +205,27 @@ class ProfileScreen extends StatelessWidget {
                           );
                         },
                       ),
-                      _buildMenuItem(
-                        icon: Icons.notifications_outlined,
-                        title: 'Notifications',
-                        subtitle: 'Configure notification preferences',
-                        iconColor: Colors.amber,
-                        onTap: () {
-                          _showComingSoonDialog(context, 'Notifications');
+                      StreamBuilder<int>(
+                        stream: NotificationService().getUnreadCountStream(currentUser.uid),
+                        builder: (context, snapshot) {
+                          final unreadCount = snapshot.data ?? 0;
+                          return _buildMenuItem(
+                            icon: Icons.notifications_outlined,
+                            title: 'Notifications',
+                            subtitle: unreadCount > 0 
+                              ? '$unreadCount new notifications'
+                              : 'View your notifications',
+                            iconColor: Colors.amber,
+                            badge: unreadCount > 0 ? unreadCount : null,
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => const NotificationsScreen(),
+                                ),
+                              );
+                            },
+                          );
                         },
                       ),
                       _buildMenuItem(
@@ -405,6 +421,7 @@ class ProfileScreen extends StatelessWidget {
     required String subtitle,
     required VoidCallback onTap,
     Color iconColor = AppTheme.warmBrown,
+    int? badge,
   }) {
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
@@ -422,17 +439,46 @@ class ProfileScreen extends StatelessWidget {
           padding: const EdgeInsets.all(16),
           child: Row(
             children: [
-              Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: iconColor.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Icon(
-                  icon,
-                  color: iconColor,
-                  size: 24,
-                ),
+              Stack(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: iconColor.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Icon(
+                      icon,
+                      color: iconColor,
+                      size: 24,
+                    ),
+                  ),
+                  if (badge != null)
+                    Positioned(
+                      right: 0,
+                      top: 0,
+                      child: Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: const BoxDecoration(
+                          color: AppTheme.errorRed,
+                          shape: BoxShape.circle,
+                        ),
+                        constraints: const BoxConstraints(
+                          minWidth: 18,
+                          minHeight: 18,
+                        ),
+                        child: Text(
+                          badge > 9 ? '9+' : '$badge',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ),
+                ],
               ),
               const SizedBox(width: 16),
               Expanded(

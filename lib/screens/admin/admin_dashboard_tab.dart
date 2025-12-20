@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../config/theme.dart';
 import '../../services/admin_service.dart';
+import '../../services/notification_service.dart';
+import '../../services/auth_service.dart';
 import '../../models/order.dart';
-import '../../models/product.dart';
+import '../../models/notification.dart';
+import 'admin_order_detail_screen.dart';
 
 class AdminDashboardTab extends StatefulWidget {
   const AdminDashboardTab({super.key});
@@ -14,7 +17,10 @@ class AdminDashboardTab extends StatefulWidget {
 
 class _AdminDashboardTabState extends State<AdminDashboardTab> {
   final _adminService = AdminService();
+  final _notificationService = NotificationService();
+  final _authService = AuthService();
   bool _isLoading = true;
+  bool _isSendingNotification = false;
   Map<String, dynamic> _stats = {};
 
   @override
@@ -45,6 +51,51 @@ class _AdminDashboardTabState extends State<AdminDashboardTab> {
     }
   }
 
+  Future<void> _sendTestNotification() async {
+    final userId = _authService.currentUser?.uid;
+    if (userId == null) return;
+
+    setState(() => _isSendingNotification = true);
+
+    try {
+      await _notificationService.createNotification(
+        userId: userId,
+        title: '🔔 Test Notification',
+        message: 'This is a test notification from admin dashboard!',
+        type: NotificationType.general,
+      );
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Row(
+              children: [
+                Icon(Icons.check_circle, color: Colors.white),
+                SizedBox(width: 12),
+                Text('Test notification sent!'),
+              ],
+            ),
+            backgroundColor: Colors.green,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to send notification: $e'),
+            backgroundColor: AppTheme.errorRed,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isSendingNotification = false);
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
@@ -62,106 +113,223 @@ class _AdminDashboardTabState extends State<AdminDashboardTab> {
       child: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          // Statistics Cards Grid
-          GridView.count(
-            crossAxisCount: 2,
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            mainAxisSpacing: 16,
-            crossAxisSpacing: 16,
-            childAspectRatio: 1.5,
+          // Statistics Cards - Row 1
+          Row(
             children: [
-              _buildStatCard(
-                icon: Icons.inventory_2,
-                title: 'Total Products',
-                value: '${_stats['totalProducts'] ?? 0}',
-                color: Colors.blue,
+              Expanded(
+                child: _buildStatCard(
+                  icon: Icons.inventory_2,
+                  title: 'Total Products',
+                  value: '${_stats['totalProducts'] ?? 0}',
+                  color: Colors.blue,
+                ),
               ),
-              _buildStatCard(
-                icon: Icons.pending_actions,
-                title: 'Pending Orders',
-                value: '${_stats['pendingOrders'] ?? 0}',
-                color: Colors.orange,
-              ),
-              _buildStatCard(
-                icon: Icons.receipt_long,
-                title: 'Total Orders',
-                value: '${_stats['totalOrders'] ?? 0}',
-                color: Colors.green,
-              ),
-              _buildStatCard(
-                icon: Icons.attach_money,
-                title: 'Total Revenue',
-                value: currencyFormatter.format(_stats['totalRevenue'] ?? 0),
-                color: AppTheme.softOrange,
-                compact: true,
+              const SizedBox(width: 12),
+              Expanded(
+                child: _buildStatCard(
+                  icon: Icons.pending_actions,
+                  title: 'Pending Orders',
+                  value: '${_stats['pendingOrders'] ?? 0}',
+                  color: Colors.orange,
+                ),
               ),
             ],
+          ),
+          const SizedBox(height: 12),
+          
+          // Statistics Cards - Row 2
+          Row(
+            children: [
+              Expanded(
+                child: _buildStatCard(
+                  icon: Icons.receipt_long,
+                  title: 'Total Orders',
+                  value: '${_stats['totalOrders'] ?? 0}',
+                  color: Colors.green,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _buildStatCard(
+                  icon: Icons.attach_money,
+                  title: 'Total Revenue',
+                  value: currencyFormatter.format(_stats['totalRevenue'] ?? 0),
+                  color: AppTheme.softOrange,
+                ),
+              ),
+            ],
+          ),
+          
+          const SizedBox(height: 24),
+          
+          // Admin Tools Section
+          Row(
+            children: [
+              Container(
+                width: 4,
+                height: 24,
+                decoration: BoxDecoration(
+                  color: Colors.purple,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              const SizedBox(width: 8),
+              const Text(
+                'Admin Tools',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: AppTheme.warmBrown,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.05),
+                  blurRadius: 10,
+                ),
+              ],
+            ),
+            child: Column(
+              children: [
+                // Test Notification Button
+                InkWell(
+                  onTap: _isSendingNotification ? null : _sendTestNotification,
+                  borderRadius: BorderRadius.circular(12),
+                  child: Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.purple.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: Colors.purple.withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: _isSendingNotification
+                              ? const SizedBox(
+                                  width: 24,
+                                  height: 24,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    valueColor: AlwaysStoppedAnimation(Colors.purple),
+                                  ),
+                                )
+                              : const Icon(
+                                  Icons.notifications_active,
+                                  color: Colors.purple,
+                                  size: 24,
+                                ),
+                        ),
+                        const SizedBox(width: 16),
+                        const Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Send Test Notification',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppTheme.warmBrown,
+                                ),
+                              ),
+                              SizedBox(height: 2),
+                              Text(
+                                'Send a test notification to yourself',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: AppTheme.darkGray,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const Icon(
+                          Icons.send,
+                          color: Colors.purple,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
           
           const SizedBox(height: 32),
           
           // Recent Orders Section
-          const Text(
-            'Recent Orders',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: AppTheme.warmBrown,
-            ),
+          Row(
+            children: [
+              Container(
+                width: 4,
+                height: 24,
+                decoration: BoxDecoration(
+                  color: AppTheme.softOrange,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              const SizedBox(width: 8),
+              const Text(
+                'Recent Orders',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: AppTheme.warmBrown,
+                ),
+              ),
+            ],
           ),
           const SizedBox(height: 16),
           
-          ...(_stats['recentOrders'] as List<OrderModel>? ?? []).map((order) {
-            return Card(
-              margin: const EdgeInsets.only(bottom: 12),
-              child: ListTile(
-                leading: CircleAvatar(
-                  backgroundColor: _getStatusColor(order.status).withOpacity(0.2),
-                  child: Icon(
-                    Icons.receipt,
-                    color: _getStatusColor(order.status),
+          // Orders list
+          if ((_stats['recentOrders'] as List<OrderModel>? ?? []).isEmpty)
+            Container(
+              padding: const EdgeInsets.all(32),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.05),
+                    blurRadius: 10,
                   ),
-                ),
-                title: Text(
-                  '${order.items.length} items',
-                  style: const TextStyle(fontWeight: FontWeight.w500),
-                ),
-                subtitle: Text(
-                  DateFormat('dd MMM yyyy, HH:mm').format(order.createdAt),
-                ),
-                trailing: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Text(
-                      currencyFormatter.format(order.totalAmount),
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: AppTheme.warmBrown,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                      decoration: BoxDecoration(
-                        color: _getStatusColor(order.status),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Text(
-                        _getStatusText(order.status),
-                        style: const TextStyle(
-                          fontSize: 10,
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+                ],
               ),
-            );
-          }),
+              child: Column(
+                children: [
+                  Icon(
+                    Icons.receipt_long_outlined,
+                    size: 48,
+                    color: AppTheme.darkGray.withOpacity(0.3),
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    'No orders yet',
+                    style: TextStyle(
+                      color: AppTheme.darkGray.withOpacity(0.7),
+                    ),
+                  ),
+                ],
+              ),
+            )
+          else
+            ...(_stats['recentOrders'] as List<OrderModel>).map((order) {
+              return _buildOrderCard(order, currencyFormatter);
+            }),
         ],
       ),
     );
@@ -172,35 +340,152 @@ class _AdminDashboardTabState extends State<AdminDashboardTab> {
     required String title,
     required String value,
     required Color color,
-    bool compact = false,
   }) {
-    return Card(
-      elevation: 2,
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Icon(icon, color: color, size: 32),
-            const SizedBox(height: 12),
-            Text(
-              title,
-              style: const TextStyle(
-                fontSize: 12,
-                color: AppTheme.darkGray,
-              ),
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: color.withOpacity(0.1),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(10),
             ),
-            const SizedBox(height: 4),
-            Text(
+            child: Icon(icon, color: color, size: 24),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            title,
+            style: TextStyle(
+              fontSize: 12,
+              color: AppTheme.darkGray.withOpacity(0.8),
+            ),
+          ),
+          const SizedBox(height: 4),
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.centerLeft,
+            child: Text(
               value,
               style: TextStyle(
-                fontSize: compact ? 14 : 20,
+                fontSize: 20,
                 fontWeight: FontWeight.bold,
                 color: color,
               ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildOrderCard(OrderModel order, NumberFormat currencyFormatter) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => AdminOrderDetailScreen(order: order),
+          ),
+        );
+      },
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 10,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: _getStatusColor(order.status).withOpacity(0.1),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(
+                Icons.receipt,
+                color: _getStatusColor(order.status),
+                size: 24,
+              ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '${order.items.length} items',
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 15,
+                      color: AppTheme.warmBrown,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    DateFormat('dd MMM yyyy, HH:mm').format(order.createdAt),
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: AppTheme.darkGray.withOpacity(0.7),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text(
+                  currencyFormatter.format(order.totalAmount),
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: AppTheme.warmBrown,
+                    fontSize: 14,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: _getStatusColor(order.status),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    _getStatusText(order.status),
+                    style: const TextStyle(
+                      fontSize: 10,
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(width: 8),
+            Icon(
+              Icons.chevron_right,
+              color: AppTheme.darkGray.withOpacity(0.4),
             ),
           ],
         ),

@@ -5,6 +5,8 @@ import '../../config/theme.dart';
 import '../../providers/cart_provider.dart';
 import '../../services/auth_service.dart';
 import '../../services/order_service.dart';
+import '../../services/notification_service.dart';
+import '../../models/order.dart';
 import '../../widgets/buttons/primary_button.dart';
 import '../main/main_screen.dart';
 
@@ -20,6 +22,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   final _addressController = TextEditingController();
   final _authService = AuthService();
   final _orderService = OrderService();
+  final _notificationService = NotificationService();
 
   String _paymentMethod = 'COD';
   bool _isLoading = false;
@@ -42,11 +45,18 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       final cart = Provider.of<CartProvider?>(context, listen: false);
       if (cart == null) throw Exception('Cart not available');
       
-      await _orderService.createOrder(
+      final orderId = await _orderService.createOrder(
         userId: userId,
         items: cart.items.values.toList(),
         deliveryAddress: _addressController.text,
         paymentMethod: _paymentMethod,
+      );
+
+      // Send notification to user
+      await _notificationService.createOrderNotification(
+        userId: userId,
+        orderId: orderId,
+        status: OrderStatus.pending,
       );
 
       cart.clear();

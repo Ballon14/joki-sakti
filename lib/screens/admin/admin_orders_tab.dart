@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../config/theme.dart';
 import '../../services/admin_service.dart';
+import '../../services/notification_service.dart';
 import '../../models/order.dart';
 
 class AdminOrdersTab extends StatefulWidget {
@@ -13,6 +14,7 @@ class AdminOrdersTab extends StatefulWidget {
 
 class _AdminOrdersTabState extends State<AdminOrdersTab> {
   final _adminService = AdminService();
+  final _notificationService = NotificationService();
   OrderStatus? _filterStatus;
 
   @override
@@ -209,6 +211,14 @@ class _AdminOrdersTabState extends State<AdminOrdersTab> {
   Future<void> _updateStatus(OrderModel order, OrderStatus newStatus) async {
     try {
       await _adminService.updateOrderStatus(order.id, newStatus);
+      
+      // Send notification to user
+      await _notificationService.createOrderNotification(
+        userId: order.userId,
+        orderId: order.id,
+        status: newStatus,
+      );
+      
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
