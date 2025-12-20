@@ -42,7 +42,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       decimalDigits: 0,
     );
     
-    final cartProvider = Provider.of<CartProvider>(context, listen: false);
+    final cartProvider = Provider.of<CartProvider?>(context, listen: false);
 
     return Scaffold(
       body: Stack(
@@ -255,6 +255,15 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 child: PrimaryButton(
                   text: 'Add to Cart',
                   onPressed: () {
+                    if (cartProvider == null) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Please login to add items to cart'),
+                          backgroundColor: AppTheme.errorRed,
+                        ),
+                      );
+                      return;
+                    }
                     try {
                       cartProvider.addItem(widget.product, quantity: _quantity);
                       ScaffoldMessenger.of(context).showSnackBar(

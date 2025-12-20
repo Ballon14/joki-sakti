@@ -39,7 +39,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       final userId = _authService.currentUser?.uid;
       if (userId == null) throw Exception('User not logged in');
 
-      final cart = Provider.of<CartProvider>(context, listen: false);
+      final cart = Provider.of<CartProvider?>(context, listen: false);
+      if (cart == null) throw Exception('Cart not available');
       
       await _orderService.createOrder(
         userId: userId,
@@ -91,8 +92,13 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       appBar: AppBar(
         title: const Text('Checkout'),
       ),
-      body: Consumer<CartProvider>(
+      body: Consumer<CartProvider?>(
         builder: (context, cart, child) {
+          if (cart == null) {
+            return const Center(
+              child: Text('Cart not available'),
+            );
+          }
           return SingleChildScrollView(
             child: Padding(
               padding: const EdgeInsets.all(16),

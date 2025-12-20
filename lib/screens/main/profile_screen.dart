@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../config/theme.dart';
 import '../../services/auth_service.dart';
 import '../../models/user.dart';
-import '../../providers/cart_provider.dart';
 import '../auth/login_screen.dart';
 import '../profile/account_info_screen.dart';
 import '../profile/help_support_screen.dart';
@@ -162,6 +161,112 @@ class ProfileScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 16),
                       
+                      // Database Test Button (for debugging)
+                      Card(
+                        color: Colors.blue.shade50,
+                        child: InkWell(
+                          onTap: () async {
+                            try {
+                              final firestore = FirebaseFirestore.instance;
+                              
+                              // Test save
+                              await firestore
+                                  .collection('users')
+                                  .doc(currentUser.uid)
+                                  .collection('cart')
+                                  .doc('test_product')
+                                  .set({
+                                'productId': 'test_product',
+                                'quantity': 99,
+                                'addedAt': FieldValue.serverTimestamp(),
+                              });
+                              
+                              // Test load
+                              final snapshot = await firestore
+                                  .collection('users')
+                                  .doc(currentUser.uid)
+                                  .collection('cart')
+                                  .get();
+                              
+                              if (context.mounted) {
+                                showDialog(
+                                  context: context,
+                                  builder: (context) => AlertDialog(
+                                    title: const Text('✅ Database Test'),
+                                    content: Text(
+                                      'Database Working!\n\n'
+                                      'Saved: test_product (qty: 99)\n'
+                                      'Total items in cart DB: ${snapshot.docs.length}\n\n'
+                                      'Check Firebase Console:\n'
+                                      'users/${currentUser.uid}/cart'
+                                    ),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () => Navigator.pop(context),
+                                        child: const Text('OK'),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              }
+                            } catch (e) {
+                              if (context.mounted) {
+                                showDialog(
+                                  context: context,
+                                  builder: (context) => AlertDialog(
+                                    title: const Text('❌ Database Error'),
+                                    content: Text('Error: $e'),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () => Navigator.pop(context),
+                                        child: const Text('OK'),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              }
+                            }
+                          },
+                          borderRadius: BorderRadius.circular(16),
+                          child: const Padding(
+                            padding: EdgeInsets.all(16),
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Icons.bug_report,
+                                  color: Colors.blue,
+                                ),
+                                SizedBox(width: 16),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'Test Database',
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w500,
+                                          color: Colors.blue,
+                                        ),
+                                      ),
+                                      SizedBox(height: 2),
+                                      Text(
+                                        'Verify cart database is working',
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          color: Colors.grey,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      
                       // Logout Button
                       Card(
                         color: AppTheme.errorRed.withOpacity(0.1),
@@ -195,13 +300,7 @@ class ProfileScreen extends StatelessWidget {
                             );
 
                             if (confirm == true && context.mounted) {
-                              // Clear cart before logout
-                              final cartProvider = Provider.of<CartProvider>(
-                                context,
-                                listen: false,
-                              );
-                              cartProvider.reset();
-                              
+                              // ProxyProvider will automatically dispose cart on signOut
                               await authService.signOut();
                               if (context.mounted) {
                                 Navigator.of(context).pushAndRemoveUntil(

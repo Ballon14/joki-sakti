@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';
 import 'firebase_options.dart';
 import 'config/theme.dart';
@@ -47,7 +48,43 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => CartProvider()),
+        // Stream auth state
+        StreamProvider<User?>(
+          create: (_) => AuthService().authStateChanges,
+          initialData: null,
+        ),
+        
+        // Provide CartProvider with userId from auth state
+        // FIXED: Use ChangeNotifierProxyProvider for ChangeNotifier classes
+        ChangeNotifierProxyProvider<User?, CartProvider?>(
+          create: (_) => null,
+          update: (context, user, previousCart) {
+            // User logged out - dispose cart
+            if (user == null) {
+              if (previousCart != null) {
+                print('👋 User logged out - disposing CartProvider');
+                previousCart.dispose();
+              }
+              return null;
+            }
+            
+            // User logged in - create or update cart
+            if (previousCart == null || previousCart.userId != user.uid) {
+              // Dispose old cart if user changed
+              if (previousCart != null && previousCart.userId != user.uid) {
+                print('🔄 User changed - disposing old CartProvider');
+                previousCart.dispose();
+              }
+              
+              // Create new cart for this user
+              print('🆕 Creating CartProvider for user: ${user.uid}');
+              return CartProvider(userId: user.uid);
+            }
+            
+            // Same user, keep existing cart
+            return previousCart;
+          },
+        ),
       ],
       child: MaterialApp(
         title: 'ROTIKU',

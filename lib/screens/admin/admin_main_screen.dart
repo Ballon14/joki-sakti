@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import '../../config/theme.dart';
 import '../../services/auth_service.dart';
-import '../../providers/cart_provider.dart';
 import '../auth/login_screen.dart';
 import 'admin_dashboard_tab.dart';
 import 'admin_products_tab.dart';
@@ -45,10 +43,7 @@ class _AdminMainScreenState extends State<AdminMainScreen> {
     );
 
     if (confirmed == true && mounted) {
-      // Clear cart before logout
-      final cartProvider = Provider.of<CartProvider>(context, listen: false);
-      cartProvider.reset();
-      
+      // ProxyProvider will automatically dispose cart on signOut
       await _authService.signOut();
       if (mounted) {
         Navigator.of(context).pushAndRemoveUntil(

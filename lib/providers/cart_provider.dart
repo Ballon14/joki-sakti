@@ -4,88 +4,120 @@ import '../models/cart_item.dart';
 import '../services/cart_service.dart';
 
 class CartProvider with ChangeNotifier {
-  final Map<String, CartItem> _items = {};
+  final String userId;
   final CartService _cartService = CartService();
-  String? _userId;
+  final Map<String, CartItem> _items = {};
   bool _isInitialized = false;
+  bool _isLoading = false;
+
+  CartProvider({required this.userId}) {
+    print('🛒 CartProvider created for user: $userId');
+    _loadInitialCart();
+  }
 
   Map<String, CartItem> get items => {..._items};
-
   int get itemCount => _items.length;
-
   int get totalQuantity {
     return _items.values.fold(0, (sum, item) => sum + item.quantity);
   }
-
   double get totalAmount {
     return _items.values.fold(0.0, (sum, item) => sum + item.totalPrice);
   }
-
   bool get isInitialized => _isInitialized;
+  bool get isLoading => _isLoading;
 
   bool productInCart(String productId) {
     return _items.containsKey(productId);
   }
 
-  // Initialize cart for a specific user
-  Future<void> initializeForUser(String userId) async {
-    _userId = userId;
-    _isInitialized = false;
-    _items.clear();
+  // Auto-load cart from Firestore on creation
+  Future<void> _loadInitialCart() async {
+    _isLoading = true;
     notifyListeners();
+
+    try {
+      print('📥 Loading cart from Firestore for user: $userId');
+      final cartData = await _cartService.loadUserCart(userId);
+      
+      if (cartData.isNotEmpty) {
+        print('✅ Found ${cartData.length} items in Firestore cart');
+        // Note: We'll need to fetch products to populate cart items
+        // This will be handled by the UI layer providing products
+      } else {
+        print('📭 No cart items found in Firestore');
+      }
+      
+      _isInitialized = true;
+      _isLoading = false;
+      notifyListeners();
+      print('✅ Cart initialization complete');
+    } catch (e) {
+      print('❌ Error loading cart: $e');
+      _isInitialized = true;
+      _isLoading = false;
+      notifyListeners();
+    }
   }
 
-  // Load cart from Firestore
-  Future<void> loadCartFromFirestore(Map<String, Product> productsMap) async {
-    if (_userId == null) {
-      print('⚠️ Cannot load cart: userId is null');
+  // Load cart with product data
+  Future<void> loadCartWithProducts(Map<String, Product> productsMap) async {
+    if (_isInitialized && _items.isNotEmpty) {
+      print('⏭️ Cart already loaded with products, skipping');
       return;
     }
 
     try {
-      final cartData = await _cartService.loadUserCart(_userId!);
+      print('📥 Loading cart with product details for user: $userId');
+      final cartData = await _cartService.loadUserCart(userId);
       
       _items.clear();
+      int loadedCount = 0;
+      int skippedCount = 0;
+
       for (var entry in cartData.entries) {
         final productId = entry.key;
         final quantity = entry.value;
         
-        // Get product from the provided products map
         final product = productsMap[productId];
         if (product != null) {
           _items[productId] = CartItem(
             product: product,
             quantity: quantity,
           );
+          loadedCount++;
+          print('  ✓ Loaded: ${product.name} x$quantity');
         } else {
-          print('⚠️ Product $productId not found in catalog');
+          skippedCount++;
+          print('  ⚠️ Product $productId not found in catalog');
         }
       }
       
       _isInitialized = true;
       notifyListeners();
-      print('✅ Cart loaded: ${_items.length} items');
+      print('✅ Cart loaded: $loadedCount items (skipped: $skippedCount)');
     } catch (e) {
-      print('❌ Error loading cart: $e');
+      print('❌ Error loading cart with products: $e');
       _isInitialized = true;
       notifyListeners();
     }
   }
 
   void addItem(Product product, {int quantity = 1}) {
+    print('➕ Adding to cart: ${product.name} x$quantity (user: $userId)');
+    
     if (_items.containsKey(product.id)) {
-      // Update quantity
       int newQuantity = _items[product.id]!.quantity + quantity;
       
-      // Check stock
       if (newQuantity > product.stock) {
+        print('❌ Insufficient stock for ${product.name}');
         throw Exception('Insufficient stock');
       }
       
       _items[product.id]!.quantity = newQuantity;
+      print('  Updated quantity to: $newQuantity');
     } else {
-      // Check stock
       if (quantity > product.stock) {
+        print('❌ Insufficient stock for ${product.name}');
         throw Exception('Insufficient stock');
       }
       
@@ -93,12 +125,15 @@ class CartProvider with ChangeNotifier {
         product: product,
         quantity: quantity,
       );
+      print('  Added new item to cart');
     }
     
-    // Sync to Firestore
-    if (_userId != null) {
-      _cartService.saveCartItem(_userId!, product.id, _items[product.id]!.quantity);
-    }
+    // Sync to Firestore - userId is guaranteed to be set
+    _cartService.saveCartItem(userId, product.id, _items[product.id]!.quantity).then((_) {
+      print('✅ Saved to Firestore: ${product.name}');
+    }).catchError((e) {
+      print('❌ Failed to save to Firestore: $e');
+    });
     
     notifyListeners();
   }
@@ -108,17 +143,18 @@ class CartProvider with ChangeNotifier {
       if (quantity <= 0) {
         removeItem(productId);
       } else {
-        // Check stock
         if (quantity > _items[productId]!.product.stock) {
           throw Exception('Insufficient stock');
         }
         
+        print('🔄 Updating quantity for $productId: $quantity (user: $userId)');
         _items[productId]!.quantity = quantity;
         
-        // Sync to Firestore
-        if (_userId != null) {
-          _cartService.saveCartItem(_userId!, productId, quantity);
-        }
+        _cartService.saveCartItem(userId, productId, quantity).then((_) {
+          print('✅ Updated in Firestore');
+        }).catchError((e) {
+          print('❌ Failed to update in Firestore: $e');
+        });
         
         notifyListeners();
       }
@@ -126,32 +162,35 @@ class CartProvider with ChangeNotifier {
   }
 
   void removeItem(String productId) {
+    print('🗑️ Removing from cart: $productId (user: $userId)');
     _items.remove(productId);
     
-    // Sync to Firestore
-    if (_userId != null) {
-      _cartService.removeCartItem(_userId!, productId);
-    }
+    _cartService.removeCartItem(userId, productId).then((_) {
+      print('✅ Removed from Firestore');
+    }).catchError((e) {
+      print('❌ Failed to remove from Firestore: $e');
+    });
     
     notifyListeners();
   }
 
   Future<void> clear() async {
+    print('🧹 Clearing cart for user: $userId');
     _items.clear();
     
-    // Sync to Firestore
-    if (_userId != null) {
-      await _cartService.clearCart(_userId!);
+    try {
+      await _cartService.clearCart(userId);
+      print('✅ Cart cleared from Firestore');
+    } catch (e) {
+      print('❌ Failed to clear cart from Firestore: $e');
     }
     
     notifyListeners();
   }
 
-  // Reset provider (on logout)
-  void reset() {
-    _userId = null;
-    _items.clear();
-    _isInitialized = false;
-    notifyListeners();
+  @override
+  void dispose() {
+    print('🗑️ CartProvider disposed for user: $userId');
+    super.dispose();
   }
 }

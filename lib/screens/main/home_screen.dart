@@ -13,7 +13,7 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final productService = ProductService();
-    final cartProvider = Provider.of<CartProvider>(context, listen: false);
+    final cartProvider = Provider.of<CartProvider?>(context, listen: false);
 
     return Scaffold(
       appBar: AppBar(
@@ -135,6 +135,15 @@ class HomeScreen extends StatelessWidget {
                       },
                       onAddToCart: product.isAvailable
                           ? () {
+                              if (cartProvider == null) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text('Please login to add items to cart'),
+                                    backgroundColor: AppTheme.errorRed,
+                                  ),
+                                );
+                                return;
+                              }
                               try {
                                 cartProvider.addItem(product);
                                 ScaffoldMessenger.of(context).showSnackBar(
