@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../config/theme.dart';
 import '../../services/auth_service.dart';
 import '../../models/user.dart';
+import '../../providers/cart_provider.dart';
 import '../auth/login_screen.dart';
 import '../profile/account_info_screen.dart';
 import '../profile/help_support_screen.dart';
@@ -193,6 +195,13 @@ class ProfileScreen extends StatelessWidget {
                             );
 
                             if (confirm == true && context.mounted) {
+                              // Clear cart before logout
+                              final cartProvider = Provider.of<CartProvider>(
+                                context,
+                                listen: false,
+                              );
+                              cartProvider.reset();
+                              
                               await authService.signOut();
                               if (context.mounted) {
                                 Navigator.of(context).pushAndRemoveUntil(

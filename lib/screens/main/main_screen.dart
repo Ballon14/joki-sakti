@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/cart_provider.dart';
+import '../../services/auth_service.dart';
+import '../../services/product_service.dart';
 import 'home_screen.dart';
 import 'cart_screen.dart';
 import 'orders_screen.dart';
@@ -15,6 +17,7 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   int _currentIndex = 0;
+  bool _isCartInitialized = false;
 
   final List<Widget> _screens = const [
     HomeScreen(),
@@ -24,7 +27,56 @@ class _MainScreenState extends State<MainScreen> {
   ];
 
   @override
+  void initState() {
+    super.initState();
+    _initializeCart();
+  }
+
+  Future<void> _initializeCart() async {
+    final cartProvider = Provider.of<CartProvider>(context, listen: false);
+    final authService = AuthService();
+    final productService = ProductService();
+    final currentUser = authService.currentUser;
+
+    if (currentUser != null && !cartProvider.isInitialized) {
+      try {
+        // Initialize cart for this user
+        await cartProvider.initializeForUser(currentUser.uid);
+        
+        // Get all products to build the products map
+        final products = await productService.getProducts().first;
+        final productsMap = {for (var p in products) p.id: p};
+        
+        // Load cart from Firestore
+        await cartProvider.loadCartFromFirestore(productsMap);
+        
+        setState(() {
+          _isCartInitialized = true;
+        });
+      } catch (e) {
+        print('Error initializing cart: $e');
+        setState(() {
+          _isCartInitialized = true;
+        });
+      }
+    } else {
+      setState(() {
+        _isCartInitialized = true;
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    // Show loading while cart initializes
+    if (!_isCartInitialized) {
+      return const Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+
     return Scaffold(
       body: _screens[_currentIndex],
       bottomNavigationBar: Consumer<CartProvider>(
@@ -66,3 +118,4 @@ class _MainScreenState extends State<MainScreen> {
     );
   }
 }
+
