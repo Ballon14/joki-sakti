@@ -61,14 +61,19 @@ class CartProvider with ChangeNotifier {
 
   // Load cart with product data
   Future<void> loadCartWithProducts(Map<String, Product> productsMap) async {
-    if (_isInitialized && _items.isNotEmpty) {
-      print('⏭️ Cart already loaded with products, skipping');
-      return;
-    }
-
     try {
-      print('📥 Loading cart with product details for user: $userId');
+      print('📥 [LOAD] Loading cart with product details for user: $userId');
+      print('   Current items in memory: ${_items.length}');
+      
       final cartData = await _cartService.loadUserCart(userId);
+      print('   Items in database: ${cartData.length}');
+      
+      if (cartData.isEmpty) {
+        print('📭 [LOAD] No items in database, cart is empty');
+        _isInitialized = true;
+        notifyListeners();
+        return;
+      }
       
       _items.clear();
       int loadedCount = 0;
@@ -94,9 +99,10 @@ class CartProvider with ChangeNotifier {
       
       _isInitialized = true;
       notifyListeners();
-      print('✅ Cart loaded: $loadedCount items (skipped: $skippedCount)');
+      print('✅ [LOAD] Cart loaded: $loadedCount items (skipped: $skippedCount)');
+      print('   Total items now in cart: ${_items.length}');
     } catch (e) {
-      print('❌ Error loading cart with products: $e');
+      print('❌ [LOAD] Error loading cart with products: $e');
       _isInitialized = true;
       notifyListeners();
     }

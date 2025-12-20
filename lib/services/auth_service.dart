@@ -131,4 +131,37 @@ class AuthService {
       throw Exception('Failed to send reset email: ${e.toString()}');
     }
   }
+
+  // Change password
+  Future<void> changePassword(String currentPassword, String newPassword) async {
+    try {
+      final user = _auth.currentUser;
+      if (user == null) {
+        throw Exception('No user logged in');
+      }
+
+      // Re-authenticate user before changing password
+      final credential = EmailAuthProvider.credential(
+        email: user.email!,
+        password: currentPassword,
+      );
+      
+      await user.reauthenticateWithCredential(credential);
+      
+      // Update password
+      await user.updatePassword(newPassword);
+    } on FirebaseAuthException catch (e) {
+      String message = 'Failed to change password';
+      if (e.code == 'wrong-password') {
+        message = 'Current password is incorrect';
+      } else if (e.code == 'weak-password') {
+        message = 'New password is too weak';
+      } else if (e.code == 'requires-recent-login') {
+        message = 'Please logout and login again before changing password';
+      }
+      throw Exception(message);
+    } catch (e) {
+      throw Exception('Failed to change password: ${e.toString()}');
+    }
+  }
 }

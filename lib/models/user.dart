@@ -36,5 +36,21 @@ class UserModel {
     };
   }
 
+  UserModel copyWith({
+    String? id,
+    String? email,
+    String? name,
+    String? role,
+    DateTime? createdAt,
+  }) {
+    return UserModel(
+      id: id ?? this.id,
+      email: email ?? this.email,
+      name: name ?? this.name,
+      role: role ?? this.role,
+      createdAt: createdAt ?? this.createdAt,
+    );
+  }
+
   bool get isAdmin => role == 'admin';
 }
