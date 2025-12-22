@@ -112,57 +112,66 @@ class HomeScreen extends StatelessWidget {
 
                 final products = snapshot.data!;
 
-                return GridView.builder(
-                  padding: const EdgeInsets.all(16),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 12,
-                    mainAxisSpacing: 16,
-                    childAspectRatio: 0.75,
-                  ),
-                  itemCount: products.length,
-                  itemBuilder: (context, index) {
-                    final product = products[index];
-                    return ProductCard(
-                      product: product,
-                      onTap: () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (_) =>
-                                ProductDetailScreen(product: product),
-                          ),
+                return LayoutBuilder(
+                  builder: (context, constraints) {
+                    // Responsive grid: 3 columns for web, 2 for mobile
+                    final crossAxisCount = constraints.maxWidth > 600 ? 3 : 2;
+                    // Better aspect ratio for more compact cards
+                    final aspectRatio = constraints.maxWidth > 600 ? 0.85 : 0.8;
+                    
+                    return GridView.builder(
+                      padding: const EdgeInsets.all(16),
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: crossAxisCount,
+                        crossAxisSpacing: 16,
+                        mainAxisSpacing: 20,
+                        childAspectRatio: aspectRatio,
+                      ),
+                      itemCount: products.length,
+                      itemBuilder: (context, index) {
+                        final product = products[index];
+                        return ProductCard(
+                          product: product,
+                          onTap: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (_) =>
+                                    ProductDetailScreen(product: product),
+                              ),
+                            );
+                          },
+                          onAddToCart: product.isAvailable
+                              ? () {
+                                  if (cartProvider == null) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text('Please login to add items to cart'),
+                                        backgroundColor: AppTheme.errorRed,
+                                      ),
+                                    );
+                                    return;
+                                  }
+                                  try {
+                                    cartProvider.addItem(product);
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text('${product.name} added to cart'),
+                                        backgroundColor: AppTheme.successGreen,
+                                        duration: const Duration(seconds: 1),
+                                      ),
+                                    );
+                                  } catch (e) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(e.toString().replaceAll('Exception: ', '')),
+                                        backgroundColor: AppTheme.errorRed,
+                                      ),
+                                    );
+                                  }
+                                }
+                              : null,
                         );
                       },
-                      onAddToCart: product.isAvailable
-                          ? () {
-                              if (cartProvider == null) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text('Please login to add items to cart'),
-                                    backgroundColor: AppTheme.errorRed,
-                                  ),
-                                );
-                                return;
-                              }
-                              try {
-                                cartProvider.addItem(product);
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text('${product.name} added to cart'),
-                                    backgroundColor: AppTheme.successGreen,
-                                    duration: const Duration(seconds: 1),
-                                  ),
-                                );
-                              } catch (e) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text(e.toString().replaceAll('Exception: ', '')),
-                                    backgroundColor: AppTheme.errorRed,
-                                  ),
-                                );
-                              }
-                            }
-                          : null,
                     );
                   },
                 );
