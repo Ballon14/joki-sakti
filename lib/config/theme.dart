@@ -18,15 +18,14 @@ class AppTheme {
     return ThemeData(
       primaryColor: warmBrown,
       scaffoldBackgroundColor: Colors.white,
-      colorScheme: ColorScheme.light(
+      colorScheme: const ColorScheme.light(
         primary: warmBrown,
         secondary: softOrange,
         surface: Colors.white,
-        background: cream,
         error: errorRed,
       ),
       useMaterial3: true,
-      
+
       // Typography
       textTheme: GoogleFonts.nunitoTextTheme(
         const TextTheme(
@@ -67,7 +66,7 @@ class AppTheme {
           ),
         ),
       ),
-      
+
       // AppBar
       appBarTheme: const AppBarTheme(
         backgroundColor: Colors.white,
@@ -79,7 +78,7 @@ class AppTheme {
           fontWeight: FontWeight.w600,
         ),
       ),
-      
+
       // Elevated Button
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
@@ -90,14 +89,14 @@ class AppTheme {
             borderRadius: BorderRadius.circular(28),
           ),
           elevation: 4,
-          shadowColor: softOrange.withOpacity(0.3),
+          shadowColor: softOrange.withValues(alpha: 0.3),
           textStyle: const TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.w600,
           ),
         ),
       ),
-      
+
       // Input Decoration
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
@@ -114,20 +113,21 @@ class AppTheme {
           borderRadius: BorderRadius.circular(16),
           borderSide: const BorderSide(color: errorRed, width: 2),
         ),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         hintStyle: const TextStyle(color: Colors.grey),
       ),
-      
+
       // Card
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         color: Colors.white,
         elevation: 2,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
         ),
-        shadowColor: Colors.black.withOpacity(0.06),
+        shadowColor: Colors.black.withValues(alpha: 0.06),
       ),
-      
+
       // Bottom Navigation
       bottomNavigationBarTheme: const BottomNavigationBarThemeData(
         backgroundColor: Colors.white,
@@ -146,7 +146,7 @@ class AppTheme {
       ),
     );
   }
-  
+
   // Gradient for buttons
   static LinearGradient get primaryGradient {
     return const LinearGradient(
@@ -155,7 +155,7 @@ class AppTheme {
       end: Alignment.bottomRight,
     );
   }
-  
+
   // Background gradient
   static LinearGradient get backgroundGradient {
     return const LinearGradient(

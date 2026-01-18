@@ -111,7 +111,7 @@ class _AdminOrderDetailScreenState extends State<AdminOrderDetailScreen> {
                 gradient: LinearGradient(
                   colors: [
                     _getStatusColor(_order.status),
-                    _getStatusColor(_order.status).withOpacity(0.8),
+                    _getStatusColor(_order.status).withValues(alpha: 0.8),
                   ],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
@@ -119,7 +119,7 @@ class _AdminOrderDetailScreenState extends State<AdminOrderDetailScreen> {
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: [
                   BoxShadow(
-                    color: _getStatusColor(_order.status).withOpacity(0.3),
+                    color: _getStatusColor(_order.status).withValues(alpha: 0.3),
                     blurRadius: 15,
                     offset: const Offset(0, 8),
                   ),
@@ -146,7 +146,7 @@ class _AdminOrderDetailScreenState extends State<AdminOrderDetailScreen> {
                     'Order #${_order.id.substring(0, 8).toUpperCase()}',
                     style: TextStyle(
                       fontSize: 14,
-                      color: Colors.white.withOpacity(0.8),
+                      color: Colors.white.withValues(alpha: 0.8),
                     ),
                   ),
                 ],
@@ -185,7 +185,7 @@ class _AdminOrderDetailScreenState extends State<AdminOrderDetailScreen> {
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
+                    color: Colors.black.withValues(alpha: 0.05),
                     blurRadius: 10,
                   ),
                 ],
@@ -202,7 +202,7 @@ class _AdminOrderDetailScreenState extends State<AdminOrderDetailScreen> {
                       decoration: BoxDecoration(
                         border: isLast ? null : Border(
                           bottom: BorderSide(
-                            color: Colors.grey.withOpacity(0.2),
+                            color: Colors.grey.withValues(alpha: 0.2),
                           ),
                         ),
                       ),
@@ -212,7 +212,7 @@ class _AdminOrderDetailScreenState extends State<AdminOrderDetailScreen> {
                             width: 50,
                             height: 50,
                             decoration: BoxDecoration(
-                              color: AppTheme.softOrange.withOpacity(0.1),
+                              color: AppTheme.softOrange.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(10),
                             ),
                             child: Center(
@@ -242,7 +242,7 @@ class _AdminOrderDetailScreenState extends State<AdminOrderDetailScreen> {
                                   currencyFormatter.format(item.price),
                                   style: TextStyle(
                                     fontSize: 13,
-                                    color: AppTheme.darkGray.withOpacity(0.7),
+                                    color: AppTheme.darkGray.withValues(alpha: 0.7),
                                   ),
                                 ),
                               ],
@@ -305,7 +305,7 @@ class _AdminOrderDetailScreenState extends State<AdminOrderDetailScreen> {
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
+                    color: Colors.black.withValues(alpha: 0.05),
                     blurRadius: 10,
                   ),
                 ],
@@ -393,7 +393,7 @@ class _AdminOrderDetailScreenState extends State<AdminOrderDetailScreen> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
           ),
         ],
@@ -411,7 +411,7 @@ class _AdminOrderDetailScreenState extends State<AdminOrderDetailScreen> {
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: AppTheme.softOrange.withOpacity(0.1),
+              color: AppTheme.softOrange.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Icon(icon, color: AppTheme.softOrange, size: 20),
@@ -425,7 +425,7 @@ class _AdminOrderDetailScreenState extends State<AdminOrderDetailScreen> {
                   label,
                   style: TextStyle(
                     fontSize: 12,
-                    color: AppTheme.darkGray.withOpacity(0.7),
+                    color: AppTheme.darkGray.withValues(alpha: 0.7),
                   ),
                 ),
                 const SizedBox(height: 2),

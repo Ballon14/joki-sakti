@@ -11,7 +11,7 @@ class CartProvider with ChangeNotifier {
   bool _isLoading = false;
 
   CartProvider({required this.userId}) {
-    print('🛒 CartProvider created for user: $userId');
+    debugPrint('🛒 CartProvider created for user: $userId');
     _loadInitialCart();
   }
 
@@ -36,23 +36,23 @@ class CartProvider with ChangeNotifier {
     notifyListeners();
 
     try {
-      print('📥 Loading cart from Firestore for user: $userId');
+      debugPrint('📥 Loading cart from Firestore for user: $userId');
       final cartData = await _cartService.loadUserCart(userId);
       
       if (cartData.isNotEmpty) {
-        print('✅ Found ${cartData.length} items in Firestore cart');
+        debugPrint('✅ Found ${cartData.length} items in Firestore cart');
         // Note: We'll need to fetch products to populate cart items
         // This will be handled by the UI layer providing products
       } else {
-        print('📭 No cart items found in Firestore');
+        debugPrint('📭 No cart items found in Firestore');
       }
       
       _isInitialized = true;
       _isLoading = false;
       notifyListeners();
-      print('✅ Cart initialization complete');
+      debugPrint('✅ Cart initialization complete');
     } catch (e) {
-      print('❌ Error loading cart: $e');
+      debugPrint('❌ Error loading cart: $e');
       _isInitialized = true;
       _isLoading = false;
       notifyListeners();
@@ -62,14 +62,14 @@ class CartProvider with ChangeNotifier {
   // Load cart with product data
   Future<void> loadCartWithProducts(Map<String, Product> productsMap) async {
     try {
-      print('📥 [LOAD] Loading cart with product details for user: $userId');
-      print('   Current items in memory: ${_items.length}');
+      debugPrint('📥 [LOAD] Loading cart with product details for user: $userId');
+      debugPrint('   Current items in memory: ${_items.length}');
       
       final cartData = await _cartService.loadUserCart(userId);
-      print('   Items in database: ${cartData.length}');
+      debugPrint('   Items in database: ${cartData.length}');
       
       if (cartData.isEmpty) {
-        print('📭 [LOAD] No items in database, cart is empty');
+        debugPrint('📭 [LOAD] No items in database, cart is empty');
         _isInitialized = true;
         notifyListeners();
         return;
@@ -90,40 +90,40 @@ class CartProvider with ChangeNotifier {
             quantity: quantity,
           );
           loadedCount++;
-          print('  ✓ Loaded: ${product.name} x$quantity');
+          debugPrint('  ✓ Loaded: ${product.name} x$quantity');
         } else {
           skippedCount++;
-          print('  ⚠️ Product $productId not found in catalog');
+          debugPrint('  ⚠️ Product $productId not found in catalog');
         }
       }
       
       _isInitialized = true;
       notifyListeners();
-      print('✅ [LOAD] Cart loaded: $loadedCount items (skipped: $skippedCount)');
-      print('   Total items now in cart: ${_items.length}');
+      debugPrint('✅ [LOAD] Cart loaded: $loadedCount items (skipped: $skippedCount)');
+      debugPrint('   Total items now in cart: ${_items.length}');
     } catch (e) {
-      print('❌ [LOAD] Error loading cart with products: $e');
+      debugPrint('❌ [LOAD] Error loading cart with products: $e');
       _isInitialized = true;
       notifyListeners();
     }
   }
 
   void addItem(Product product, {int quantity = 1}) {
-    print('➕ Adding to cart: ${product.name} x$quantity (user: $userId)');
+    debugPrint('➕ Adding to cart: ${product.name} x$quantity (user: $userId)');
     
     if (_items.containsKey(product.id)) {
       int newQuantity = _items[product.id]!.quantity + quantity;
       
       if (newQuantity > product.stock) {
-        print('❌ Insufficient stock for ${product.name}');
+        debugPrint('❌ Insufficient stock for ${product.name}');
         throw Exception('Insufficient stock');
       }
       
       _items[product.id]!.quantity = newQuantity;
-      print('  Updated quantity to: $newQuantity');
+      debugPrint('  Updated quantity to: $newQuantity');
     } else {
       if (quantity > product.stock) {
-        print('❌ Insufficient stock for ${product.name}');
+        debugPrint('❌ Insufficient stock for ${product.name}');
         throw Exception('Insufficient stock');
       }
       
@@ -131,14 +131,14 @@ class CartProvider with ChangeNotifier {
         product: product,
         quantity: quantity,
       );
-      print('  Added new item to cart');
+      debugPrint('  Added new item to cart');
     }
     
     // Sync to Firestore - userId is guaranteed to be set
     _cartService.saveCartItem(userId, product.id, _items[product.id]!.quantity).then((_) {
-      print('✅ Saved to Firestore: ${product.name}');
+      debugPrint('✅ Saved to Firestore: ${product.name}');
     }).catchError((e) {
-      print('❌ Failed to save to Firestore: $e');
+      debugPrint('❌ Failed to save to Firestore: $e');
     });
     
     notifyListeners();
@@ -153,13 +153,13 @@ class CartProvider with ChangeNotifier {
           throw Exception('Insufficient stock');
         }
         
-        print('🔄 Updating quantity for $productId: $quantity (user: $userId)');
+        debugPrint('🔄 Updating quantity for $productId: $quantity (user: $userId)');
         _items[productId]!.quantity = quantity;
         
         _cartService.saveCartItem(userId, productId, quantity).then((_) {
-          print('✅ Updated in Firestore');
+          debugPrint('✅ Updated in Firestore');
         }).catchError((e) {
-          print('❌ Failed to update in Firestore: $e');
+          debugPrint('❌ Failed to update in Firestore: $e');
         });
         
         notifyListeners();
@@ -168,27 +168,27 @@ class CartProvider with ChangeNotifier {
   }
 
   void removeItem(String productId) {
-    print('🗑️ Removing from cart: $productId (user: $userId)');
+    debugPrint('🗑️ Removing from cart: $productId (user: $userId)');
     _items.remove(productId);
     
     _cartService.removeCartItem(userId, productId).then((_) {
-      print('✅ Removed from Firestore');
+      debugPrint('✅ Removed from Firestore');
     }).catchError((e) {
-      print('❌ Failed to remove from Firestore: $e');
+      debugPrint('❌ Failed to remove from Firestore: $e');
     });
     
     notifyListeners();
   }
 
   Future<void> clear() async {
-    print('🧹 Clearing cart for user: $userId');
+    debugPrint('🧹 Clearing cart for user: $userId');
     _items.clear();
     
     try {
       await _cartService.clearCart(userId);
-      print('✅ Cart cleared from Firestore');
+      debugPrint('✅ Cart cleared from Firestore');
     } catch (e) {
-      print('❌ Failed to clear cart from Firestore: $e');
+      debugPrint('❌ Failed to clear cart from Firestore: $e');
     }
     
     notifyListeners();
@@ -196,7 +196,7 @@ class CartProvider with ChangeNotifier {
 
   @override
   void dispose() {
-    print('🗑️ CartProvider disposed for user: $userId');
+    debugPrint('🗑️ CartProvider disposed for user: $userId');
     super.dispose();
   }
 }

@@ -44,7 +44,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
       final cart = Provider.of<CartProvider?>(context, listen: false);
       if (cart == null) throw Exception('Cart not available');
-      
+
       final orderId = await _orderService.createOrder(
         userId: userId,
         items: cart.items.values.toList(),
@@ -160,7 +160,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                   ],
                                 ),
                               );
-                            }).toList(),
+                            }),
                             const Divider(height: 24),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -240,8 +240,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                               });
                             },
                             title: const Text('Cash on Delivery (COD)'),
-                            subtitle:
-                                const Text('Pay when bread arrives at your door'),
+                            subtitle: const Text(
+                                'Pay when bread arrives at your door'),
                             activeColor: AppTheme.softOrange,
                           ),
                           const Divider(height: 1),
@@ -254,7 +254,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                               });
                             },
                             title: const Text('Bank Transfer'),
-                            subtitle: const Text('Transfer to our bank account'),
+                            subtitle:
+                                const Text('Transfer to our bank account'),
                             activeColor: AppTheme.softOrange,
                           ),
                         ],

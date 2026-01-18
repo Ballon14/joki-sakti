@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import '../models/user.dart';
 
 class AuthService {
@@ -78,21 +79,21 @@ class AuthService {
   Future<UserModel?> getUserData(String uid) async {
     try {
       final doc = await _firestore.collection('users').doc(uid).get();
-      
+
       if (!doc.exists) {
-        print('⚠️ User document not found for uid: $uid');
+        debugPrint('⚠️ User document not found for uid: $uid');
         return null;
       }
-      
+
       final data = doc.data();
       if (data == null) {
-        print('⚠️ User document data is null for uid: $uid');
+        debugPrint('⚠️ User document data is null for uid: $uid');
         return null;
       }
-      
+
       return UserModel.fromMap(data, uid);
     } catch (e) {
-      print('❌ Error getting user data: $e');
+      debugPrint('❌ Error getting user data: $e');
       return null;
     }
   }
@@ -133,7 +134,8 @@ class AuthService {
   }
 
   // Change password
-  Future<void> changePassword(String currentPassword, String newPassword) async {
+  Future<void> changePassword(
+      String currentPassword, String newPassword) async {
     try {
       final user = _auth.currentUser;
       if (user == null) {
@@ -145,9 +147,9 @@ class AuthService {
         email: user.email!,
         password: currentPassword,
       );
-      
+
       await user.reauthenticateWithCredential(credential);
-      
+
       // Update password
       await user.updatePassword(newPassword);
     } on FirebaseAuthException catch (e) {

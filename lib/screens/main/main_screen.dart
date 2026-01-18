@@ -39,17 +39,17 @@ class _MainScreenState extends State<MainScreen> {
 
     final cart = Provider.of<CartProvider?>(context, listen: false);
     if (cart == null) {
-      print('⚠️ No cart available');
+      debugPrint('⚠️ No cart available');
       return;
     }
 
     if (cart.isLoading) {
-      print('⏳ Cart is still loading...');
+      debugPrint('⏳ Cart is still loading...');
       return;
     }
 
     try {
-      print('🔄 Loading products for cart...');
+      debugPrint('🔄 Loading products for cart...');
       final productService = ProductService();
       final products = await productService.getProducts().first;
       final productsMap = {for (var p in products) p.id: p};
@@ -60,7 +60,7 @@ class _MainScreenState extends State<MainScreen> {
         _cartProductsLoaded = true;
       });
     } catch (e) {
-      print('❌ Error loading cart products: $e');
+      debugPrint('❌ Error loading cart products: $e');
       setState(() {
         _cartProductsLoaded = true;
       });

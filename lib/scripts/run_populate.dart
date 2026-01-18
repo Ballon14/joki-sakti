@@ -13,13 +13,13 @@ void main() async {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
-    print('✅ Firebase initialized');
+    debugPrint('✅ Firebase initialized');
     
     // Add products
     await PopulateProducts.addSampleProducts();
     
-    print('\n✨ Done! You can close this now.');
+    debugPrint('\n✨ Done! You can close this now.');
   } catch (e) {
-    print('❌ Error: $e');
+    debugPrint('❌ Error: $e');
   }
 }

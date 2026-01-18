@@ -141,7 +141,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                   Icon(
                     Icons.notifications_off_outlined,
                     size: 80,
-                    color: AppTheme.darkGray.withOpacity(0.3),
+                    color: AppTheme.darkGray.withValues(alpha: 0.3),
                   ),
                   const SizedBox(height: 16),
                   const Text(
@@ -156,7 +156,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                     'You\'ll see your order updates here',
                     style: TextStyle(
                       fontSize: 14,
-                      color: AppTheme.darkGray.withOpacity(0.7),
+                      color: AppTheme.darkGray.withValues(alpha: 0.7),
                     ),
                   ),
                 ],
@@ -207,16 +207,16 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           decoration: BoxDecoration(
             color: notification.isRead
                 ? Colors.white
-                : AppTheme.softOrange.withOpacity(0.1),
+                : AppTheme.softOrange.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(16),
             border: notification.isRead
                 ? null
                 : Border.all(
-                    color: AppTheme.softOrange.withOpacity(0.3),
+                    color: AppTheme.softOrange.withValues(alpha: 0.3),
                   ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.05),
+                color: Colors.black.withValues(alpha: 0.05),
                 blurRadius: 10,
                 offset: const Offset(0, 2),
               ),
@@ -228,7 +228,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: _getTypeColor(notification.type).withOpacity(0.1),
+                  color: _getTypeColor(notification.type).withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(
@@ -272,7 +272,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                       notification.message,
                       style: TextStyle(
                         fontSize: 13,
-                        color: AppTheme.darkGray.withOpacity(0.8),
+                        color: AppTheme.darkGray.withValues(alpha: 0.8),
                       ),
                     ),
                     const SizedBox(height: 8),
@@ -280,7 +280,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                       _formatTime(notification.createdAt),
                       style: TextStyle(
                         fontSize: 11,
-                        color: AppTheme.darkGray.withOpacity(0.6),
+                        color: AppTheme.darkGray.withValues(alpha: 0.6),
                       ),
                     ),
                   ],

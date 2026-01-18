@@ -193,7 +193,7 @@ class _AdminDashboardTabState extends State<AdminDashboardTab> {
               borderRadius: BorderRadius.circular(16),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
+                  color: Colors.black.withValues(alpha: 0.05),
                   blurRadius: 10,
                 ),
               ],
@@ -207,7 +207,7 @@ class _AdminDashboardTabState extends State<AdminDashboardTab> {
                   child: Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: Colors.purple.withOpacity(0.1),
+                      color: Colors.purple.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Row(
@@ -215,7 +215,7 @@ class _AdminDashboardTabState extends State<AdminDashboardTab> {
                         Container(
                           padding: const EdgeInsets.all(10),
                           decoration: BoxDecoration(
-                            color: Colors.purple.withOpacity(0.2),
+                            color: Colors.purple.withValues(alpha: 0.2),
                             borderRadius: BorderRadius.circular(10),
                           ),
                           child: _isSendingNotification
@@ -304,7 +304,7 @@ class _AdminDashboardTabState extends State<AdminDashboardTab> {
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
+                    color: Colors.black.withValues(alpha: 0.05),
                     blurRadius: 10,
                   ),
                 ],
@@ -314,13 +314,13 @@ class _AdminDashboardTabState extends State<AdminDashboardTab> {
                   Icon(
                     Icons.receipt_long_outlined,
                     size: 48,
-                    color: AppTheme.darkGray.withOpacity(0.3),
+                    color: AppTheme.darkGray.withValues(alpha: 0.3),
                   ),
                   const SizedBox(height: 12),
                   Text(
                     'No orders yet',
                     style: TextStyle(
-                      color: AppTheme.darkGray.withOpacity(0.7),
+                      color: AppTheme.darkGray.withValues(alpha: 0.7),
                     ),
                   ),
                 ],
@@ -348,7 +348,7 @@ class _AdminDashboardTabState extends State<AdminDashboardTab> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: color.withOpacity(0.1),
+            color: color.withValues(alpha: 0.1),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -360,7 +360,7 @@ class _AdminDashboardTabState extends State<AdminDashboardTab> {
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
+              color: color.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Icon(icon, color: color, size: 24),
@@ -370,7 +370,7 @@ class _AdminDashboardTabState extends State<AdminDashboardTab> {
             title,
             style: TextStyle(
               fontSize: 12,
-              color: AppTheme.darkGray.withOpacity(0.8),
+              color: AppTheme.darkGray.withValues(alpha: 0.8),
             ),
           ),
           const SizedBox(height: 4),
@@ -409,7 +409,7 @@ class _AdminDashboardTabState extends State<AdminDashboardTab> {
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 10,
               offset: const Offset(0, 2),
             ),
@@ -420,7 +420,7 @@ class _AdminDashboardTabState extends State<AdminDashboardTab> {
             Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: _getStatusColor(order.status).withOpacity(0.1),
+                color: _getStatusColor(order.status).withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(
@@ -447,7 +447,7 @@ class _AdminDashboardTabState extends State<AdminDashboardTab> {
                     DateFormat('dd MMM yyyy, HH:mm').format(order.createdAt),
                     style: TextStyle(
                       fontSize: 12,
-                      color: AppTheme.darkGray.withOpacity(0.7),
+                      color: AppTheme.darkGray.withValues(alpha: 0.7),
                     ),
                   ),
                 ],
@@ -485,7 +485,7 @@ class _AdminDashboardTabState extends State<AdminDashboardTab> {
             const SizedBox(width: 8),
             Icon(
               Icons.chevron_right,
-              color: AppTheme.darkGray.withOpacity(0.4),
+              color: AppTheme.darkGray.withValues(alpha: 0.4),
             ),
           ],
         ),

@@ -38,7 +38,7 @@ class _SavedAddressesScreenState extends State<SavedAddressesScreen> {
           }
         }
       } catch (e) {
-        print('Error loading addresses: $e');
+        debugPrint('Error loading addresses: $e');
       }
     }
     setState(() => _isLoading = false);

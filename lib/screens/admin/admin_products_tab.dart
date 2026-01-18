@@ -3,7 +3,6 @@ import 'package:intl/intl.dart';
 import '../../config/theme.dart';
 import '../../services/admin_service.dart';
 import '../../models/product.dart';
-import '../../models/product.dart';
 
 class AdminProductsTab extends StatefulWidget {
   const AdminProductsTab({super.key});
@@ -36,7 +35,8 @@ class _AdminProductsTabState extends State<AdminProductsTab> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.inventory_2, size: 80, color: Colors.grey.shade400),
+                  Icon(Icons.inventory_2,
+                      size: 80, color: Colors.grey.shade400),
                   const SizedBox(height: 16),
                   const Text(
                     'No products yet',
@@ -101,7 +101,8 @@ class _AdminProductsTabState extends State<AdminProductsTab> {
                         onPressed: () => _showProductDialog(product: product),
                       ),
                       IconButton(
-                        icon: const Icon(Icons.delete, color: AppTheme.errorRed),
+                        icon:
+                            const Icon(Icons.delete, color: AppTheme.errorRed),
                         onPressed: () => _deleteProduct(product),
                       ),
                     ],
@@ -202,7 +203,7 @@ class _AdminProductsTabState extends State<AdminProductsTab> {
 
                   if (isEdit) {
                     await _adminService.updateProduct(
-                      product!.id,
+                      product.id,
                       productData.toMap(),
                     );
                   } else {
@@ -255,7 +256,8 @@ class _AdminProductsTabState extends State<AdminProductsTab> {
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Delete', style: TextStyle(color: AppTheme.errorRed)),
+            child: const Text('Delete',
+                style: TextStyle(color: AppTheme.errorRed)),
           ),
         ],
       ),

@@ -37,9 +37,9 @@ class _CartScreenState extends State<CartScreen> {
         _productsMap = {for (var p in products) p.id: p};
         _productsLoaded = true;
       });
-      print('✅ Products loaded: ${_productsMap.length}');
+      debugPrint('✅ Products loaded: ${_productsMap.length}');
     } catch (e) {
-      print('❌ Error loading products: $e');
+      debugPrint('❌ Error loading products: $e');
       setState(() {
         _productsLoaded = true;
       });
@@ -138,7 +138,7 @@ class _CartScreenState extends State<CartScreen> {
           // Get cart items from database
           final cartDocs = snapshot.data?.docs ?? [];
           
-          print('📦 Cart from database: ${cartDocs.length} items');
+          debugPrint('📦 Cart from database: ${cartDocs.length} items');
 
           // Empty cart
           if (cartDocs.isEmpty) {
@@ -149,7 +149,7 @@ class _CartScreenState extends State<CartScreen> {
                   Icon(
                     Icons.shopping_cart_outlined,
                     size: 100,
-                    color: AppTheme.warmBrown.withOpacity(0.3),
+                    color: AppTheme.warmBrown.withValues(alpha: 0.3),
                   ),
                   const SizedBox(height: 16),
                   const Text(
@@ -191,7 +191,7 @@ class _CartScreenState extends State<CartScreen> {
             }
           }
 
-          print('🛒 Valid cart items: ${cartItems.length}');
+          debugPrint('🛒 Valid cart items: ${cartItems.length}');
 
           if (cartItems.isEmpty) {
             return Center(
@@ -201,7 +201,7 @@ class _CartScreenState extends State<CartScreen> {
                   Icon(
                     Icons.shopping_cart_outlined,
                     size: 100,
-                    color: AppTheme.warmBrown.withOpacity(0.3),
+                    color: AppTheme.warmBrown.withValues(alpha: 0.3),
                   ),
                   const SizedBox(height: 16),
                   const Text(

@@ -95,7 +95,7 @@ class HomeScreen extends StatelessWidget {
                         Icon(
                           Icons.bakery_dining,
                           size: 80,
-                          color: AppTheme.warmBrown.withOpacity(0.5),
+                          color: AppTheme.warmBrown.withValues(alpha: 0.5),
                         ),
                         const SizedBox(height: 16),
                         const Text(

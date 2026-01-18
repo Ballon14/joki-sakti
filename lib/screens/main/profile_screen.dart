@@ -70,7 +70,7 @@ class ProfileScreen extends StatelessWidget {
                           shape: BoxShape.circle,
                           boxShadow: [
                             BoxShadow(
-                              color: AppTheme.softOrange.withOpacity(0.3),
+                              color: AppTheme.softOrange.withValues(alpha: 0.3),
                               blurRadius: 20,
                               spreadRadius: 5,
                             ),
@@ -105,7 +105,7 @@ class ProfileScreen extends StatelessWidget {
                           vertical: 6,
                         ),
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.7),
+                          color: Colors.white.withValues(alpha: 0.7),
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Text(
@@ -124,7 +124,7 @@ class ProfileScreen extends StatelessWidget {
                           vertical: 4,
                         ),
                         decoration: BoxDecoration(
-                          color: AppTheme.softOrange.withOpacity(0.2),
+                          color: AppTheme.softOrange.withValues(alpha: 0.2),
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(
                             color: AppTheme.softOrange,
@@ -206,15 +206,16 @@ class ProfileScreen extends StatelessWidget {
                         },
                       ),
                       StreamBuilder<int>(
-                        stream: NotificationService().getUnreadCountStream(currentUser.uid),
+                        stream: NotificationService()
+                            .getUnreadCountStream(currentUser.uid),
                         builder: (context, snapshot) {
                           final unreadCount = snapshot.data ?? 0;
                           return _buildMenuItem(
                             icon: Icons.notifications_outlined,
                             title: 'Notifications',
-                            subtitle: unreadCount > 0 
-                              ? '$unreadCount new notifications'
-                              : 'View your notifications',
+                            subtitle: unreadCount > 0
+                                ? '$unreadCount new notifications'
+                                : 'View your notifications',
                             iconColor: Colors.amber,
                             badge: unreadCount > 0 ? unreadCount : null,
                             onTap: () {
@@ -280,22 +281,22 @@ class ProfileScreen extends StatelessWidget {
                           );
                         },
                       ),
-                      
+
                       const SizedBox(height: 24),
-                      
+
                       // Logout Button
                       Container(
                         width: double.infinity,
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
                             colors: [
-                              AppTheme.errorRed.withOpacity(0.1),
-                              AppTheme.errorRed.withOpacity(0.05),
+                              AppTheme.errorRed.withValues(alpha: 0.1),
+                              AppTheme.errorRed.withValues(alpha: 0.05),
                             ],
                           ),
                           borderRadius: BorderRadius.circular(16),
                           border: Border.all(
-                            color: AppTheme.errorRed.withOpacity(0.3),
+                            color: AppTheme.errorRed.withValues(alpha: 0.3),
                           ),
                         ),
                         child: Material(
@@ -327,7 +328,7 @@ class ProfileScreen extends StatelessWidget {
                           ),
                         ),
                       ),
-                      
+
                       const SizedBox(height: 32),
                     ],
                   ),
@@ -340,7 +341,8 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  Future<void> _handleLogout(BuildContext context, AuthService authService) async {
+  Future<void> _handleLogout(
+      BuildContext context, AuthService authService) async {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -390,31 +392,6 @@ class ProfileScreen extends StatelessWidget {
     }
   }
 
-  void _showComingSoonDialog(BuildContext context, String feature) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-        ),
-        title: const Row(
-          children: [
-            Icon(Icons.construction, color: AppTheme.softOrange),
-            SizedBox(width: 12),
-            Text('Coming Soon'),
-          ],
-        ),
-        content: Text('$feature feature is coming soon!'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('OK'),
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget _buildMenuItem({
     required IconData icon,
     required String title,
@@ -429,7 +406,7 @@ class ProfileScreen extends StatelessWidget {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
         side: BorderSide(
-          color: Colors.grey.withOpacity(0.1),
+          color: Colors.grey.withValues(alpha: 0.1),
         ),
       ),
       child: InkWell(
@@ -444,7 +421,7 @@ class ProfileScreen extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: iconColor.withOpacity(0.1),
+                      color: iconColor.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Icon(
@@ -498,7 +475,7 @@ class ProfileScreen extends StatelessWidget {
                       subtitle,
                       style: TextStyle(
                         fontSize: 12,
-                        color: AppTheme.darkGray.withOpacity(0.8),
+                        color: AppTheme.darkGray.withValues(alpha: 0.8),
                       ),
                     ),
                   ],
@@ -506,7 +483,7 @@ class ProfileScreen extends StatelessWidget {
               ),
               Icon(
                 Icons.chevron_right_rounded,
-                color: AppTheme.darkGray.withOpacity(0.5),
+                color: AppTheme.darkGray.withValues(alpha: 0.5),
               ),
             ],
           ),

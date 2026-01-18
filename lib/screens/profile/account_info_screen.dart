@@ -180,7 +180,7 @@ class _AccountInfoScreenState extends State<AccountInfoScreen> {
                 icon: Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: AppTheme.softOrange.withOpacity(0.2),
+                    color: AppTheme.softOrange.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: const Icon(Icons.edit, size: 20),
@@ -208,7 +208,7 @@ class _AccountInfoScreenState extends State<AccountInfoScreen> {
                               shape: BoxShape.circle,
                               boxShadow: [
                                 BoxShadow(
-                                  color: AppTheme.softOrange.withOpacity(0.3),
+                                  color: AppTheme.softOrange.withValues(alpha: 0.3),
                                   blurRadius: 20,
                                   spreadRadius: 5,
                                 ),
@@ -246,7 +246,7 @@ class _AccountInfoScreenState extends State<AccountInfoScreen> {
                               vertical: 4,
                             ),
                             decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.7),
+                              color: Colors.white.withValues(alpha: 0.7),
                               borderRadius: BorderRadius.circular(20),
                             ),
                             child: Text(
@@ -404,7 +404,7 @@ class _AccountInfoScreenState extends State<AccountInfoScreen> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -415,7 +415,7 @@ class _AccountInfoScreenState extends State<AccountInfoScreen> {
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: AppTheme.softOrange.withOpacity(0.1),
+              color: AppTheme.softOrange.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Icon(icon, color: AppTheme.softOrange, size: 24),
@@ -429,7 +429,7 @@ class _AccountInfoScreenState extends State<AccountInfoScreen> {
                   label,
                   style: TextStyle(
                     fontSize: 12,
-                    color: AppTheme.darkGray.withOpacity(0.8),
+                    color: AppTheme.darkGray.withValues(alpha: 0.8),
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -439,7 +439,7 @@ class _AccountInfoScreenState extends State<AccountInfoScreen> {
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                     color: value == 'Not set'
-                        ? AppTheme.darkGray.withOpacity(0.5)
+                        ? AppTheme.darkGray.withValues(alpha: 0.5)
                         : AppTheme.warmBrown,
                   ),
                 ),
@@ -450,7 +450,7 @@ class _AccountInfoScreenState extends State<AccountInfoScreen> {
             Icon(
               Icons.lock_outline,
               size: 18,
-              color: AppTheme.darkGray.withOpacity(0.3),
+              color: AppTheme.darkGray.withValues(alpha: 0.3),
             ),
         ],
       ),
@@ -466,7 +466,7 @@ class _AccountInfoScreenState extends State<AccountInfoScreen> {
         border: Border.all(color: AppTheme.softOrange, width: 2),
         boxShadow: [
           BoxShadow(
-            color: AppTheme.softOrange.withOpacity(0.1),
+            color: AppTheme.softOrange.withValues(alpha: 0.1),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -477,7 +477,7 @@ class _AccountInfoScreenState extends State<AccountInfoScreen> {
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: AppTheme.softOrange.withOpacity(0.2),
+              color: AppTheme.softOrange.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(10),
             ),
             child: const Icon(Icons.edit, color: AppTheme.softOrange, size: 24),
@@ -517,7 +517,7 @@ class _AccountInfoScreenState extends State<AccountInfoScreen> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -535,7 +535,7 @@ class _AccountInfoScreenState extends State<AccountInfoScreen> {
                 Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: Colors.blue.withOpacity(0.1),
+                    color: Colors.blue.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: const Icon(
@@ -570,7 +570,7 @@ class _AccountInfoScreenState extends State<AccountInfoScreen> {
                 ),
                 Icon(
                   Icons.chevron_right_rounded,
-                  color: AppTheme.darkGray.withOpacity(0.5),
+                  color: AppTheme.darkGray.withValues(alpha: 0.5),
                 ),
               ],
             ),
@@ -586,10 +586,10 @@ class _AccountInfoScreenState extends State<AccountInfoScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.blue.withOpacity(0.3)),
+        border: Border.all(color: Colors.blue.withValues(alpha: 0.3)),
         boxShadow: [
           BoxShadow(
-            color: Colors.blue.withOpacity(0.05),
+            color: Colors.blue.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -603,7 +603,7 @@ class _AccountInfoScreenState extends State<AccountInfoScreen> {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: Colors.blue.withOpacity(0.1),
+                  color: Colors.blue.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: const Icon(Icons.lock_outline, color: Colors.blue, size: 20),
@@ -652,7 +652,7 @@ class _AccountInfoScreenState extends State<AccountInfoScreen> {
             'Password must be at least 6 characters',
             style: TextStyle(
               fontSize: 12,
-              color: AppTheme.darkGray.withOpacity(0.7),
+              color: AppTheme.darkGray.withValues(alpha: 0.7),
             ),
           ),
           

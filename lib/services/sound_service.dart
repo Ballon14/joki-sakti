@@ -1,4 +1,5 @@
 import 'package:audioplayers/audioplayers.dart';
+import 'package:flutter/foundation.dart';
 
 class SoundService {
   static final SoundService _instance = SoundService._internal();
@@ -10,7 +11,7 @@ class SoundService {
 
   Future<void> init() async {
     if (_isInitialized) return;
-    
+
     await _audioPlayer.setReleaseMode(ReleaseMode.stop);
     _isInitialized = true;
   }
@@ -21,20 +22,22 @@ class SoundService {
     try {
       await init();
       await _audioPlayer.setVolume(1.0); // Max volume for alert
-      
+
       // Play loud notification sound - multiple beeps
       // Using Windows notification sound URL as reliable source
       await _audioPlayer.play(
-        UrlSource('https://cdn.pixabay.com/audio/2024/02/19/audio_e4043eb3a1.mp3'),
+        UrlSource(
+            'https://cdn.pixabay.com/audio/2024/02/19/audio_e4043eb3a1.mp3'),
       );
-      
+
       // Wait and play again for more attention
       await Future.delayed(const Duration(milliseconds: 800));
       await _audioPlayer.play(
-        UrlSource('https://cdn.pixabay.com/audio/2024/02/19/audio_e4043eb3a1.mp3'),
+        UrlSource(
+            'https://cdn.pixabay.com/audio/2024/02/19/audio_e4043eb3a1.mp3'),
       );
     } catch (e) {
-      print('Error playing new order sound: $e');
+      debugPrint('Error playing new order sound: $e');
     }
   }
 
@@ -44,10 +47,11 @@ class SoundService {
       await init();
       await _audioPlayer.setVolume(0.8);
       await _audioPlayer.play(
-        UrlSource('https://cdn.pixabay.com/audio/2022/03/15/audio_c8c005e3d4.mp3'),
+        UrlSource(
+            'https://cdn.pixabay.com/audio/2022/03/15/audio_c8c005e3d4.mp3'),
       );
     } catch (e) {
-      print('Error playing notification sound: $e');
+      debugPrint('Error playing notification sound: $e');
     }
   }
 
@@ -56,7 +60,7 @@ class SoundService {
     try {
       await _audioPlayer.stop();
     } catch (e) {
-      print('Error stopping sound: $e');
+      debugPrint('Error stopping sound: $e');
     }
   }
 

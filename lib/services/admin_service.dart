@@ -25,7 +25,8 @@ class AdminService {
   }
 
   /// Update existing product
-  Future<void> updateProduct(String productId, Map<String, dynamic> updates) async {
+  Future<void> updateProduct(
+      String productId, Map<String, dynamic> updates) async {
     try {
       await _firestore.collection('products').doc(productId).update(updates);
     } catch (e) {
@@ -55,14 +56,11 @@ class AdminService {
 
   /// Get all orders stream
   Stream<List<OrderModel>> getAllOrdersStream() {
-    return _firestore
-        .collection('orders')
-        .snapshots()
-        .map((snapshot) {
+    return _firestore.collection('orders').snapshots().map((snapshot) {
       final orders = snapshot.docs
           .map((doc) => OrderModel.fromMap(doc.data(), doc.id))
           .toList();
-      
+
       // Sort by createdAt descending
       orders.sort((a, b) => b.createdAt.compareTo(a.createdAt));
       return orders;
@@ -109,8 +107,9 @@ class AdminService {
           .toList();
 
       // Count pending orders
-      final pendingOrders =
-          allOrders.where((order) => order.status == OrderStatus.pending).length;
+      final pendingOrders = allOrders
+          .where((order) => order.status == OrderStatus.pending)
+          .length;
 
       // Calculate total revenue (from processed/delivering/delivered orders)
       final totalRevenue = allOrders
@@ -118,7 +117,7 @@ class AdminService {
               order.status == OrderStatus.processed ||
               order.status == OrderStatus.delivering ||
               order.status == OrderStatus.delivered)
-          .fold(0.0, (sum, order) => sum + order.totalAmount);
+          .fold(0.0, (total, order) => total + order.totalAmount);
 
       // Get recent orders (last 5)
       allOrders.sort((a, b) => b.createdAt.compareTo(a.createdAt));

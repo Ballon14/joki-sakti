@@ -105,7 +105,7 @@ class OrdersScreen extends StatelessWidget {
                   Icon(
                     Icons.receipt_long_outlined,
                     size: 100,
-                    color: AppTheme.warmBrown.withOpacity(0.3),
+                    color: AppTheme.warmBrown.withValues(alpha: 0.3),
                   ),
                   const SizedBox(height: 16),
                   const Text(
@@ -162,7 +162,7 @@ class OrdersScreen extends StatelessWidget {
                             ),
                             decoration: BoxDecoration(
                               color: _getStatusColor(order.status)
-                                  .withOpacity(0.1),
+                                  .withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(12),
                               border: Border.all(
                                 color: _getStatusColor(order.status),
@@ -229,7 +229,7 @@ class OrdersScreen extends StatelessWidget {
                             ],
                           ),
                         );
-                      }).toList(),
+                      }),
                       const Divider(height: 24),
 
                       // Total & Payment

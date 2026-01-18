@@ -13,7 +13,8 @@ class OrderService {
     required String paymentMethod,
   }) async {
     try {
-      double totalAmount = items.fold(0.0, (sum, item) => sum + item.totalPrice);
+      double totalAmount =
+          items.fold(0.0, (total, item) => total + item.totalPrice);
 
       List<OrderItem> orderItems = items.map((cartItem) {
         return OrderItem(
@@ -62,7 +63,7 @@ class OrderService {
       final orders = snapshot.docs
           .map((doc) => OrderModel.fromMap(doc.data(), doc.id))
           .toList();
-      
+
       // Sort in memory instead
       orders.sort((a, b) => b.createdAt.compareTo(a.createdAt));
       return orders;

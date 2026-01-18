@@ -12,22 +12,22 @@ import 'providers/cart_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   // Initialize Firebase with generated options
   bool firebaseInitialized = false;
   String? firebaseError;
-  
+
   try {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
     firebaseInitialized = true;
-    print('✅ Firebase initialized successfully');
+    debugPrint('✅ Firebase initialized successfully');
   } catch (e) {
     firebaseError = e.toString();
-    print('⚠️ Firebase initialization failed: $e');
+    debugPrint('⚠️ Firebase initialization failed: $e');
   }
-  
+
   runApp(MyApp(
     firebaseInitialized: firebaseInitialized,
     firebaseError: firebaseError,
@@ -37,7 +37,7 @@ void main() async {
 class MyApp extends StatelessWidget {
   final bool firebaseInitialized;
   final String? firebaseError;
-  
+
   const MyApp({
     super.key,
     required this.firebaseInitialized,
@@ -53,7 +53,7 @@ class MyApp extends StatelessWidget {
           create: (_) => AuthService().authStateChanges,
           initialData: null,
         ),
-        
+
         // Provide CartProvider with userId from auth state
         // FIXED: Use ChangeNotifierProxyProvider for ChangeNotifier classes
         ChangeNotifierProxyProvider<User?, CartProvider?>(
@@ -62,25 +62,25 @@ class MyApp extends StatelessWidget {
             // User logged out - dispose cart
             if (user == null) {
               if (previousCart != null) {
-                print('👋 User logged out - disposing CartProvider');
+                debugPrint('👋 User logged out - disposing CartProvider');
                 previousCart.dispose();
               }
               return null;
             }
-            
+
             // User logged in - create or update cart
             if (previousCart == null || previousCart.userId != user.uid) {
               // Dispose old cart if user changed
               if (previousCart != null && previousCart.userId != user.uid) {
-                print('🔄 User changed - disposing old CartProvider');
+                debugPrint('🔄 User changed - disposing old CartProvider');
                 previousCart.dispose();
               }
-              
+
               // Create new cart for this user
-              print('🆕 Creating CartProvider for user: ${user.uid}');
+              debugPrint('🆕 Creating CartProvider for user: ${user.uid}');
               return CartProvider(userId: user.uid);
             }
-            
+
             // Same user, keep existing cart
             return previousCart;
           },
@@ -102,7 +102,7 @@ class MyApp extends StatelessWidget {
 class AuthWrapper extends StatelessWidget {
   final bool firebaseInitialized;
   final String? firebaseError;
-  
+
   const AuthWrapper({
     super.key,
     required this.firebaseInitialized,
@@ -199,10 +199,10 @@ class AuthWrapper extends StatelessWidget {
         ),
       );
     }
-    
+
     // Firebase initialized - use role-based routing
     final authService = AuthService();
-    
+
     return StreamBuilder(
       stream: authService.authStateChanges,
       builder: (context, snapshot) {
@@ -213,13 +213,13 @@ class AuthWrapper extends StatelessWidget {
             ),
           );
         }
-        
+
         final user = snapshot.data;
-        
+
         if (user == null) {
           return const LoginScreen();
         }
-        
+
         // User logged in - check role
         return FutureBuilder(
           future: authService.getUserData(user.uid),
@@ -233,12 +233,12 @@ class AuthWrapper extends StatelessWidget {
             }
 
             final userData = userSnapshot.data;
-            
+
             // Route based on user role
             if (userData?.isAdmin == true) {
               return const AdminMainScreen();
             }
-            
+
             return const MainScreen();
           },
         );

@@ -45,7 +45,7 @@ class _AdminOrdersTabState extends State<AdminOrdersTab> {
                       onSelected: (selected) {
                         setState(() => _filterStatus = selected ? status : null);
                       },
-                      selectedColor: _getStatusColor(status).withOpacity(0.3),
+                      selectedColor: _getStatusColor(status).withValues(alpha: 0.3),
                     ),
                   );
                 }),
@@ -105,7 +105,7 @@ class _AdminOrdersTabState extends State<AdminOrdersTab> {
                     margin: const EdgeInsets.only(bottom: 12),
                     child: ExpansionTile(
                       leading: CircleAvatar(
-                        backgroundColor: _getStatusColor(order.status).withOpacity(0.2),
+                        backgroundColor: _getStatusColor(order.status).withValues(alpha: 0.2),
                         child: Icon(
                           Icons.receipt,
                           color: _getStatusColor(order.status),
